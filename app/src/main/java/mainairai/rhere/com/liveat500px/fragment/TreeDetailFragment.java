@@ -32,13 +32,17 @@ public class TreeDetailFragment extends Fragment {
         void onLocationBtnClicked(TreeItemDao dao);
     }
 
+    public  interface  FullScreenListener{
+        void onFullscreenImage(boolean isShow);
+    }
+
     public TreeDetailFragment() {
         super();
     }
 
     TreeItemDao dao;
 
-    ViewPager imageSlide;
+    ViewPager imageSlide,fullImageSlide;
 
     TextView tvTreeName;
     TextView tvSciName;
@@ -48,7 +52,6 @@ public class TreeDetailFragment extends Fragment {
     Button btnShare;
     int galSize;
     CircleIndicator indicator;
-
 
 
 
@@ -98,35 +101,13 @@ public class TreeDetailFragment extends Fragment {
         galSize = Gal.size();
 
         imageSlide = (ViewPager)rootView.findViewById(R.id.detailSlideShow);
+        fullImageSlide = (ViewPager)rootView.findViewById(R.id.fullImageSlide);
         indicator = (CircleIndicator)rootView.findViewById(R.id.indicator);
-        imageSlide.setAdapter(new PagerAdapter() {
-            @Override
-            public int getCount() {
-                return galSize;
-            }
 
-            @Override
-            public boolean isViewFromObject(View view, Object object) {
-                return view == object;
-            }
+        imageSlide.setAdapter(imageAdapter);
+        fullImageSlide.setAdapter(imageAdapter);
 
-            @Override
-            public Object instantiateItem(ViewGroup container, int position) {
-                ImageView img = new ImageView(container.getContext());
-                    Glide.with(getContext())
-                            .load(Gal.get(position))
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(img);
-                    container.addView(img);
-
-                    return img;
-            }
-
-            @Override
-            public void destroyItem(ViewGroup container, int position, Object object) {
-                container.removeView((View) object);
-            }
-        });
+        imageSlide.addOnPageChangeListener(onPageChanged);
 
         indicator.setViewPager(imageSlide);
 
@@ -140,12 +121,12 @@ public class TreeDetailFragment extends Fragment {
         tvTreeName.setText("Name :"+dao.getName().toString());
         tvSciName.setText("Scientific Name :"+dao.getScientificName());
         tvTreeLocalName.setText("Local Name :"+dao.getLocalName());
-       // tvTreeDetail.setText("Detail :"+dao.getDetail());
-        int num = dao.getLocations().size()-1;
+        tvTreeDetail.setText("Detail :"+dao.getDetail());
+       /* int num = dao.getLocations().size()-1;
         for (int i=0;i<=num;i++) {
            String aa = tvTreeDetail.getText().toString();
             tvTreeDetail.setText(num+":: "+aa+" , "+dao.getLocations().get(i).getLat());
-        }
+        }*/
         btnLocation.setOnClickListener(locationBtnClick);
 
 
@@ -160,6 +141,87 @@ public class TreeDetailFragment extends Fragment {
     public void onStop() {
         super.onStop();
     }
+    PagerAdapter imageAdapter = new PagerAdapter() {
+        @Override
+        public int getCount() {
+            return galSize;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+
+            return super.getItemPosition(object);
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+
+            final List<String> Gal;
+            Gal = dao.getGallery();
+            galSize = Gal.size();
+
+
+            ImageView img = new ImageView(container.getContext());
+
+            img.setOnClickListener(imageClicked);
+
+            Glide.with(getContext())
+                    .load(Gal.get(position))
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(img);
+            container.addView(img);
+
+            return img;
+        }
+
+        View.OnClickListener imageClicked = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Image click show fullscreen
+
+                if(fullImageSlide.getVisibility()==View.VISIBLE){
+                fullImageSlide.setVisibility(View.GONE);
+
+                    FullScreenListener listener = (FullScreenListener) getActivity();
+                    listener.onFullscreenImage(true);
+                    }
+
+                else{
+                fullImageSlide.setVisibility(View.VISIBLE);
+                    FullScreenListener listener = (FullScreenListener) getActivity();
+                    listener.onFullscreenImage(false);
+                }
+
+            }
+        };
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
+        }
+    };
+
+    ViewPager.OnPageChangeListener onPageChanged = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            fullImageSlide.setCurrentItem(imageSlide.getCurrentItem());
+        }
+    };
 
     /*
      * Save Instance State Here
@@ -178,6 +240,7 @@ public class TreeDetailFragment extends Fragment {
         // Restore Instance State here
     }
 
+
     ////////////////////////////////////////////////////////////////////////////////
     View.OnClickListener locationBtnClick = new View.OnClickListener() {
         @Override
@@ -187,5 +250,6 @@ public class TreeDetailFragment extends Fragment {
 
         }
     };
+
 
 }

@@ -13,5 +13,5 @@ import retrofit2.http.POST;
 public interface ApiService {
 
     @POST("plant_by_season.php?lang_code=1&season_id=0")
-    Call<List<TreeItemDao>> loadPhotolist();
+    Call<List<TreeItemDao>> loadPhotoList();
 }

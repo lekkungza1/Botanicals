@@ -104,7 +104,7 @@ public class AllSSFragment extends Fragment {
     }
 
     private void reloadData() {
-        Call<List<TreeItemDao>> call = HttpManager.getInstance().getService().loadPhotolist();
+        Call<List<TreeItemDao>> call = HttpManager.getInstance().getService().loadPhotoList();
         call.enqueue(new PhotoListLoadCallback());
     }
 

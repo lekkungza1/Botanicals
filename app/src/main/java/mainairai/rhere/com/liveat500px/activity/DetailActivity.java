@@ -2,6 +2,7 @@ package mainairai.rhere.com.liveat500px.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
@@ -9,7 +10,7 @@ import mainairai.rhere.com.liveat500px.R;
 import mainairai.rhere.com.liveat500px.dao.TreeItemDao;
 import mainairai.rhere.com.liveat500px.fragment.TreeDetailFragment;
 
-public class DetailActivity extends AppCompatActivity implements TreeDetailFragment.LocationListener {
+public class DetailActivity extends AppCompatActivity implements TreeDetailFragment.LocationListener,TreeDetailFragment.FullScreenListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,5 +49,16 @@ public class DetailActivity extends AppCompatActivity implements TreeDetailFragm
         Intent intent = new Intent(DetailActivity.this,MapsActivity.class);
         intent.putExtra("dao",dao);
         startActivity(intent);
+    }
+
+    @Override
+    public void onFullscreenImage(boolean isShow) {
+        ActionBar actionBar = getSupportActionBar();
+        if(isShow==true){
+            actionBar.show();
+        }else{
+            actionBar.hide();
+        }
+
     }
 }

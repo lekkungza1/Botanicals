@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -17,11 +19,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import mainairai.rhere.com.liveat500px.R;
+import mainairai.rhere.com.liveat500px.dao.TreeItemDao;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.InfoWindowAdapter {
 
     private GoogleMap mMap;
-    //TreeItemDao item;
+    TreeItemDao dao;
     Button btnChangeType;
     Double lat;
     Double lng;
@@ -38,9 +41,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-       // TreeItemDao dao = getIntent().getParcelableExtra("dao");
-       // item= dao;
-       // initInstance();
+         dao = getIntent().getParcelableExtra("dao");
+
+        initInstance();
     }
 
     private void initInstance() {
@@ -69,7 +72,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         infoView.setOrientation(LinearLayout.HORIZONTAL);
         infoView.setLayoutParams(infoViewParams);
 
-      // ImageView infoImageView = new ImageView(MapsActivity.this);
 
 
         ImageView infoImageView = new ImageView(MapsActivity.this);
@@ -94,9 +96,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         subInfoView.setLayoutParams(subInfoViewParams);
 
         TextView subInfoName = new TextView(MapsActivity.this);
-        subInfoName.setText("Title"+marker.getId());
+        subInfoName.setText(dao.getName());
         TextView subInfoSciName = new TextView(MapsActivity.this);
-        subInfoSciName.setText("Sub content");
+        subInfoSciName.setText(dao.getScientificName());
         subInfoView.addView(subInfoName);
         subInfoView.addView(subInfoSciName);
         infoView.addView(subInfoView);
@@ -119,24 +121,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         mMap.setInfoWindowAdapter(this);
 
-        for (int i=0;i<10;i++) {
+
+        for (int i=0;i<dao.getLocations().size();i++) {
             // Location loc1 = item.getLocations().get(i1);
-            Double lat = 1.1;
-            Double lng = 1.1;
+             lat = Double.parseDouble(dao.getLocations().get(i).getLat());
+             lng = Double.parseDouble(dao.getLocations().get(i).getLng());
            // Log.e(">>>>>"+item.getLocations().size()+"  Lat"+lat1,"Long"+lng1+"<<<<<<<");
-            MarkerOptions marker1 = new MarkerOptions().position(new LatLng(lat+i, lng+i));//*.title(item.getName());*//*
+            MarkerOptions marker1 = new MarkerOptions().position(new LatLng(lat, lng));//*.title(item.getName());*//*
             mMap.addMarker(marker1);
         }
+        CameraUpdate center=
+                CameraUpdateFactory.newLatLng(new LatLng(19.90422,99.795));
+        CameraUpdate zoom=CameraUpdateFactory.zoomTo(16);
 
-        /*for (int i=0;i<item.getLocations().size();i++) {
-            // Location loc1 = item.getLocations().get(i1);
-            Double lat1 = Double.parseDouble(item.getLocations().get(i).getLat());
-            Double lng1 = Double.parseDouble(item.getLocations().get(i).getLng());
-           // Log.e(">>>>>"+item.getLocations().size()+"  Lat"+lat1,"Long"+lng1+"<<<<<<<");
-            MarkerOptions marker1 = new MarkerOptions().position(new LatLng(lat1, lng1));*//*.title(item.getName());*//*
-            mMap.addMarker(marker1);
-        }*/
-
+        mMap.moveCamera(center);
+        mMap.animateCamera(zoom);
     }
 
 
